@@ -11,13 +11,17 @@ import java.util.List;
 public class TvShowService {
 
     @Autowired
-    private TvShowRepository tvShowRepository;
+    private TvShowRepository tvShowRepo;
 
     public List<TvShow> getAllTvShows() {
-        return tvShowRepository.findAll();
+        return tvShowRepo.findAll();
     }
 
     public TvShow addNewTvShow(TvShow tvShow) {
-        return tvShowRepository.save(tvShow);
+        return tvShowRepo.save(tvShow);
+    }
+
+    public List<TvShow> findByTitleContains(String title) {
+        return tvShowRepo.findByTitleContainingIgnoreCase(title);
     }
 }

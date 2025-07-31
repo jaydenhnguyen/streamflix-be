@@ -5,6 +5,7 @@ import com.example.steamflix_be.models.User;
 import com.example.steamflix_be.repositories.UserRepository;
 import com.example.steamflix_be.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }
     }
 
@@ -36,9 +37,9 @@ public class AuthController {
             String accessToken = authService.login(loginRequest);
             return ResponseEntity.ok(Map.of("accessToken", accessToken));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }
     }
 

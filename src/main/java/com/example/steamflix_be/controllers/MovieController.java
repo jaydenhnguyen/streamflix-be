@@ -37,4 +37,15 @@ public class MovieController {
                     .body("Failed to retrieve movies: " + e.getMessage());
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchMoviesByTitle(@RequestParam("title") String title) {
+        try {
+            List<Movie> movies = movieService.findByTitleContains(title);
+            return ResponseEntity.ok(movies);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to search movies: " + e.getMessage());
+        }
+    }
 }
