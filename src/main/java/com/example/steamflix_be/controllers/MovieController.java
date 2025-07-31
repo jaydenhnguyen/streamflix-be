@@ -23,14 +23,20 @@ public class MovieController {
             Movie saved = movieService.addNewMovie(movie);
             return new ResponseEntity<>(saved, HttpStatus.CREATED);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create movie: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to create movie: " + e.getMessage());
         }
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllMovies() {
+    public ResponseEntity<?> getMovies(@RequestParam(value = "featured", required = false) Boolean featured) {
         try {
-            List<Movie> movies = movieService.getAllMovies();
+            List<Movie> movies;
+            if (featured != null && featured) {
+                movies = movieService.findFeaturedMovies();
+            } else {
+                movies = movieService.getAllMovies();
+            }
             return ResponseEntity.ok(movies);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -49,3 +55,4 @@ public class MovieController {
         }
     }
 }
+

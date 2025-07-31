@@ -20,7 +20,7 @@ public class TvShowController {
     public ResponseEntity<?> createTvShow(@RequestBody TvShow tvShow) {
         try {
             TvShow saved = tvShowService.addNewTvShow(tvShow);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(saved);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create TV show: " + e.getMessage());
         }
