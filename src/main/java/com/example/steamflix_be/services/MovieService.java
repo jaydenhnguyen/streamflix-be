@@ -51,23 +51,43 @@ public class MovieService {
         Movie existingMovie = movieRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Movie with ID " + id + " not found"));
 
-        // Update allowed fields (example: rentPrice, purchasePrice, synopsis, featured, etc.)
-        if (updatedMovie.getTitle() != null) existingMovie.setTitle(updatedMovie.getTitle());
-        if (updatedMovie.getType() != null) existingMovie.setType(updatedMovie.getType());
-        if (updatedMovie.getYear() != 0) existingMovie.setYear(updatedMovie.getYear());
-        if (updatedMovie.getGenre() != null) existingMovie.setGenre(updatedMovie.getGenre());
-        if (updatedMovie.getSynopsis() != null) existingMovie.setSynopsis(updatedMovie.getSynopsis());
-        if (updatedMovie.getPoster() != null) existingMovie.setPoster(updatedMovie.getPoster());
-        if (updatedMovie.getLargePoster() != null) existingMovie.setLargePoster(updatedMovie.getLargePoster());
-        if (updatedMovie.getRentPrice() > 0) existingMovie.setRentPrice(updatedMovie.getRentPrice());
-        if (updatedMovie.getPurchasePrice() > 0) existingMovie.setPurchasePrice(updatedMovie.getPurchasePrice());
+        if (updatedMovie.getTitle() != null && !updatedMovie.getTitle().isBlank())
+            existingMovie.setTitle(updatedMovie.getTitle().trim());
+
+        if (updatedMovie.getType() != null && !updatedMovie.getType().isBlank())
+            existingMovie.setType(updatedMovie.getType().trim());
+
+        if (updatedMovie.getYear() > 1900)
+            existingMovie.setYear(updatedMovie.getYear());
+
+        if (updatedMovie.getGenre() != null && !updatedMovie.getGenre().isBlank())
+            existingMovie.setGenre(updatedMovie.getGenre().trim());
+
+        if (updatedMovie.getSynopsis() != null && !updatedMovie.getSynopsis().isBlank())
+            existingMovie.setSynopsis(updatedMovie.getSynopsis().trim());
+
+        if (updatedMovie.getPoster() != null && !updatedMovie.getPoster().isBlank())
+            existingMovie.setPoster(updatedMovie.getPoster().trim());
+
+        if (updatedMovie.getLargePoster() != null && !updatedMovie.getLargePoster().isBlank())
+            existingMovie.setLargePoster(updatedMovie.getLargePoster().trim());
+
+        if (updatedMovie.getRentPrice() > 0)
+            existingMovie.setRentPrice(updatedMovie.getRentPrice());
+
+        if (updatedMovie.getPurchasePrice() > 0)
+            existingMovie.setPurchasePrice(updatedMovie.getPurchasePrice());
+
         existingMovie.setFeatured(updatedMovie.isFeatured());
         existingMovie.setMostDemanded(updatedMovie.isMostDemanded());
-        if (updatedMovie.getRating() > 0) existingMovie.setRating(updatedMovie.getRating());
 
-        existingMovie.setUpdatedAt(new Date()); // update timestamp
+        if (updatedMovie.getRating() >= 0)
+            existingMovie.setRating(updatedMovie.getRating());
+
+        existingMovie.setUpdatedAt(new Date());
 
         return movieRepo.save(existingMovie);
     }
+
 
 }

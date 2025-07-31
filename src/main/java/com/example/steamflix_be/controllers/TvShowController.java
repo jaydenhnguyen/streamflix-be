@@ -1,5 +1,6 @@
 package com.example.steamflix_be.controllers;
 
+import com.example.steamflix_be.models.Movie;
 import com.example.steamflix_be.models.TvShow;
 import com.example.steamflix_be.services.TvShowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/tvshows")
@@ -54,6 +56,21 @@ public class TvShowController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving TV show: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTvShowById(@PathVariable String id, @RequestBody TvShow updatedTvShow) {
+        try {
+            TvShow tvShow = tvShowService.updateTvShowById(id, updatedTvShow);
+            return ResponseEntity.ok(tvShow);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update tv show: " + e.getMessage());
         }
     }
 
