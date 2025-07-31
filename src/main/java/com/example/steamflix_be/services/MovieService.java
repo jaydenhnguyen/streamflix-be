@@ -89,5 +89,18 @@ public class MovieService {
         return movieRepo.save(existingMovie);
     }
 
+    public void deleteMovieById(String id) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("Movie ID must not be empty");
+        }
+
+        boolean exists = movieRepo.existsById(id);
+        if (!exists) {
+            throw new NoSuchElementException("Movie with ID " + id + " not found");
+        }
+
+        movieRepo.deleteById(id);
+    }
+
 
 }

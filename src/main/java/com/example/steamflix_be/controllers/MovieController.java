@@ -74,6 +74,20 @@ public class MovieController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteMovieById(@PathVariable String id) {
+        try {
+            movieService.deleteMovieById(id);
+            return ResponseEntity.ok("Movie with ID " + id + " deleted successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete movie: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/search")
     public ResponseEntity<?> searchMoviesByTitle(@RequestParam("title") String title) {
