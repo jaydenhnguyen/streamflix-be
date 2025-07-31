@@ -8,10 +8,10 @@ WORKDIR /app
 COPY . .
 
 # Build the JAR using Maven
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests && cp target/*.jar app.jar
 
 # Expose Spring Boot port
-EXPOSE 3000
+EXPOSE 8080
 
 # Run the app
 CMD ["java", "-jar", "target/*.jar"]
