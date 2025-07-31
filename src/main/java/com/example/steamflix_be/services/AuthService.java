@@ -1,6 +1,7 @@
 package com.example.steamflix_be.services;
 
 import com.example.steamflix_be.dto.LoginRequest;
+import com.example.steamflix_be.dto.LoginResponse;
 import org.springframework.stereotype.Service;
 import com.example.steamflix_be.models.User;
 import com.example.steamflix_be.repositories.UserRepository;
@@ -28,13 +29,22 @@ public class AuthService {
         return userRepo.save(user);
     }
 
-    public String login(LoginRequest loginRequest) {
-        User user = userRepo.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+    public LoginResponse login(LoginRequest loginRequest) {
+        User user = userRepo.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password.");
         }
 
-        return jwtService.generateAccessToken(user);
+        String accessToken = jwtService.generateAccessToken(user);
+
+        return new LoginResponse(
+                accessToken,
+                user.getId(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName()
+        );
     }
 }
