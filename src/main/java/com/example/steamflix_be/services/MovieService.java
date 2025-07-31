@@ -30,4 +30,12 @@ public class MovieService {
     public List<Movie> findFeaturedMovies() {
         return movieRepo.findByFeaturedTrue();
     }
+
+    public Movie getMovieById(String id) {
+        try {
+            return movieRepo.findById(id).orElse(null);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid movie ID format.");
+        }
+    }
 }

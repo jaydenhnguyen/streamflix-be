@@ -44,6 +44,24 @@ public class MovieController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMovieById(@PathVariable String id) {
+        try {
+            Movie movie = movieService.getMovieById(id);
+            if (movie == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Movie with ID " + id + " not found.");
+            }
+            return ResponseEntity.ok(movie);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid ID format: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving movie: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/search")
     public ResponseEntity<?> searchMoviesByTitle(@RequestParam("title") String title) {
         try {
