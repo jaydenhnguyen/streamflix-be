@@ -11,9 +11,7 @@ import java.util.NoSuchElementException;
 
 @Service
 public class TvShowService {
-
-    @Autowired
-    private TvShowRepository tvShowRepo;
+    @Autowired private TvShowRepository tvShowRepo;
 
     public List<TvShow> getAllTvShows() {
         return tvShowRepo.findAll();
