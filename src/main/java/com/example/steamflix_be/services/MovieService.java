@@ -35,7 +35,7 @@ public class MovieService {
         try {
             return movieRepo.findById(id).orElse(null);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid movie ID format.");
+            throw new IllegalArgumentException("Invalid movie ID format: " + e.getMessage());
         }
     }
 }

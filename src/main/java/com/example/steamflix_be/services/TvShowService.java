@@ -33,7 +33,7 @@ public class TvShowService {
         try {
             return tvShowRepo.findById(id).orElse(null);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid TV Show ID format.");
+            throw new IllegalArgumentException("Invalid TV Show ID format: "+e.getMessage());
         }
     }
 

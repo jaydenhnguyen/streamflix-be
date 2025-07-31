@@ -49,16 +49,13 @@ public class MovieController {
         try {
             Movie movie = movieService.getMovieById(id);
             if (movie == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Movie with ID " + id + " not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie with ID " + id + " not found.");
             }
             return ResponseEntity.ok(movie);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid ID format: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error retrieving movie: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving movie: " + e.getMessage());
         }
     }
 

@@ -47,16 +47,13 @@ public class TvShowController {
         try {
             TvShow tvShow = tvShowService.getTvShowById(id);
             if (tvShow == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("TV Show with ID " + id + " not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("TV Show with ID " + id + " not found.");
             }
             return ResponseEntity.ok(tvShow);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid ID format: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error retrieving TV show: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving TV show: " + e.getMessage());
         }
     }
 
