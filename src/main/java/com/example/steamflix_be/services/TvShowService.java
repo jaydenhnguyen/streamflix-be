@@ -94,6 +94,16 @@ public class TvShowService {
         return tvShowRepo.save(existingTvShow);
     }
 
+    public void deleteTvShowById(String id) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("TV Show ID must not be empty");
+        }
 
+        boolean exists = tvShowRepo.existsById(id);
+        if (!exists) {
+            throw new NoSuchElementException("TV Show with ID " + id + " not found");
+        }
 
+        tvShowRepo.deleteById(id);
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.steamflix_be.controllers;
 
-import com.example.steamflix_be.models.Movie;
 import com.example.steamflix_be.models.TvShow;
 import com.example.steamflix_be.services.TvShowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ public class TvShowController {
     public ResponseEntity<?> createTvShow(@RequestBody TvShow tvShow) {
         try {
             TvShow saved = tvShowService.addNewTvShow(tvShow);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(saved);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create TV show: " + e.getMessage());
         }
@@ -73,6 +72,22 @@ public class TvShowController {
                     .body("Failed to update tv show: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTvShowById(@PathVariable String id) {
+        try {
+            tvShowService.deleteTvShowById(id);
+            return ResponseEntity.ok("TV Show with ID " + id + " deleted successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete TV show: " + e.getMessage());
+        }
+    }
+
 
     @GetMapping("/search")
     public ResponseEntity<?> searchTvShowsByTitle(@RequestParam("title") String title) {

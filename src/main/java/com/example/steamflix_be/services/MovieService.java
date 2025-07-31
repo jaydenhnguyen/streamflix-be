@@ -101,6 +101,4 @@ public class MovieService {
 
         movieRepo.deleteById(id);
     }
-
-
 }
