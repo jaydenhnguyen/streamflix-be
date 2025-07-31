@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class MovieService {
@@ -16,5 +17,9 @@ public class MovieService {
         movie.setCreatedAt(new Date());
         movie.setUpdatedAt(new Date());
         return movieRepo.save(movie);
+    }
+
+    public List<Movie> getAllMovies() {
+        return movieRepo.findAll();
     }
 }
