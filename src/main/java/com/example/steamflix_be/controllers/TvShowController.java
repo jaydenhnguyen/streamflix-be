@@ -1,5 +1,6 @@
 package com.example.steamflix_be.controllers;
 
+import com.example.steamflix_be.annotations.SecureRoute;
 import com.example.steamflix_be.models.TvShow;
 import com.example.steamflix_be.services.TvShowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,15 @@ public class TvShowController {
     private TvShowService tvShowService;
 
     @PostMapping
+    @SecureRoute
     public ResponseEntity<?> createTvShow(@RequestBody TvShow tvShow) {
         try {
             TvShow saved = tvShowService.addNewTvShow(tvShow);
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create TV show: " + e.getMessage());
+            return ResponseEntity
+                    .internalServerError()
+                    .body("Failed to create TV show: " + e.getMessage());
         }
     }
 
@@ -38,7 +42,8 @@ public class TvShowController {
             }
             return ResponseEntity.ok(shows);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity
+                    .internalServerError()
                     .body("Failed to retrieve TV shows: " + e.getMessage());
         }
     }
@@ -52,38 +57,55 @@ public class TvShowController {
             }
             return ResponseEntity.ok(tvShow);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving TV show: " + e.getMessage());
+            return ResponseEntity
+                    .internalServerError()
+                    .body("Error retrieving TV show: " + e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
+    @SecureRoute
     public ResponseEntity<?> updateTvShowById(@PathVariable String id, @RequestBody TvShow updatedTvShow) {
         try {
             TvShow tvShow = tvShowService.updateTvShowById(id, updatedTvShow);
             return ResponseEntity.ok(tvShow);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity
+                    .internalServerError()
                     .body("Failed to update tv show: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
+    @SecureRoute
     public ResponseEntity<?> deleteTvShowById(@PathVariable String id) {
         try {
             tvShowService.deleteTvShowById(id);
             return ResponseEntity.ok("TV Show with ID " + id + " deleted successfully.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity
+                    .internalServerError()
                     .body("Failed to delete TV show: " + e.getMessage());
         }
     }
@@ -95,7 +117,9 @@ public class TvShowController {
             List<TvShow> tvShows = tvShowService.findByTitleContains(title);
             return ResponseEntity.ok(tvShows);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to search TV shows: " + e.getMessage());
+            return ResponseEntity
+                    .internalServerError()
+                    .body("Failed to search TV shows: " + e.getMessage());
         }
     }
 }
