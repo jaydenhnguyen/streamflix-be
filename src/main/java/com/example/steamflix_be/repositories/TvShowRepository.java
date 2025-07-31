@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface TvShowRepository extends MongoRepository<TvShow, String> {
     List<TvShow> findByTitleContainingIgnoreCase(String title);
+
+    List<TvShow> findByFeaturedTrue();
 }

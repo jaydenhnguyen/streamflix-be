@@ -27,12 +27,18 @@ public class TvShowController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllTvShows() {
+    public ResponseEntity<?> getTvShows(@RequestParam(value = "featured", required = false) Boolean featured) {
         try {
-            List<TvShow> tvShows = tvShowService.getAllTvShows();
-            return ResponseEntity.ok(tvShows);
+            List<TvShow> shows;
+            if (featured != null && featured) {
+                shows = tvShowService.findFeaturedTvShows();
+            } else {
+                shows = tvShowService.getAllTvShows();
+            }
+            return ResponseEntity.ok(shows);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve TV shows: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to retrieve TV shows: " + e.getMessage());
         }
     }
 

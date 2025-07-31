@@ -24,4 +24,8 @@ public class TvShowService {
     public List<TvShow> findByTitleContains(String title) {
         return tvShowRepo.findByTitleContainingIgnoreCase(title);
     }
+
+    public List<TvShow> findFeaturedTvShows() {
+        return tvShowRepo.findByFeaturedTrue();
+    }
 }
