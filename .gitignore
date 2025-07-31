@@ -79,3 +79,4 @@ nbdist/
 
 # Environment variables files
 .env
+/src/main/resources/application-local.properties
