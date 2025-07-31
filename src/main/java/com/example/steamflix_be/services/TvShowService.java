@@ -28,4 +28,13 @@ public class TvShowService {
     public List<TvShow> findFeaturedTvShows() {
         return tvShowRepo.findByFeaturedTrue();
     }
+
+    public TvShow getTvShowById(String id) {
+        try {
+            return tvShowRepo.findById(id).orElse(null);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid TV Show ID format.");
+        }
+    }
+
 }
