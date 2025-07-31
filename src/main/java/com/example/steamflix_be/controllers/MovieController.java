@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @RestController
@@ -58,6 +59,21 @@ public class MovieController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving movie: " + e.getMessage());
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateMovie(@PathVariable String id, @RequestBody Movie updatedMovie) {
+        try {
+            Movie movie = movieService.updateMovieById(id, updatedMovie);
+            return ResponseEntity.ok(movie);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update movie: " + e.getMessage());
+        }
+    }
+
 
     @GetMapping("/search")
     public ResponseEntity<?> searchMoviesByTitle(@RequestParam("title") String title) {
