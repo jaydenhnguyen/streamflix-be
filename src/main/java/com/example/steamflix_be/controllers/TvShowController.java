@@ -1,0 +1,37 @@
+package com.example.steamflix_be.controllers;
+
+import com.example.steamflix_be.models.TvShow;
+import com.example.steamflix_be.services.TvShowService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/tvshows")
+public class TvShowController {
+
+    @Autowired
+    private TvShowService tvShowService;
+
+    @PostMapping
+    public ResponseEntity<?> createTvShow(@RequestBody TvShow tvShow) {
+        try {
+            TvShow saved = tvShowService.addNewTvShow(tvShow);
+            return ResponseEntity.status(201).body(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to create TV show: " + e.getMessage());
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllTvShows() {
+        try {
+            List<TvShow> tvShows = tvShowService.getAllTvShows();
+            return ResponseEntity.ok(tvShows);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to retrieve TV shows: " + e.getMessage());
+        }
+    }
+}
