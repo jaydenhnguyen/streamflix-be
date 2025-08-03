@@ -38,7 +38,7 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
+                    .status(HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity
