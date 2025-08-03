@@ -27,7 +27,7 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity
                     .internalServerError()
-                    .body("Internal server error");
+                    .body("Internal server error.");
         }
     }
 
@@ -43,7 +43,7 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity
                     .internalServerError()
-                    .body("Internal server error");
+                    .body("Internal server error.");
         }
     }
 
