@@ -18,10 +18,10 @@ public class UserController {
 
     @GetMapping("/me")
     @SecureRoute
-    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+    public ResponseEntity<User> getCurrentUser(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId");
         User user = userService.getUserById(userId);
-        user.setPassword(null);
+        user.setPassword(null); // remove password before sending response
         return ResponseEntity.ok(user);
     }
 }

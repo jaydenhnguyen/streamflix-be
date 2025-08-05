@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 
@@ -21,110 +22,46 @@ public class MovieController {
 
     @PostMapping
     @SecureRoute
-    public ResponseEntity<?> createMovie(@RequestBody Movie movie) {
-        try {
-            Movie saved = movieService.addNewMovie(movie);
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .internalServerError()
-                    .body("Failed to create movie: " + e.getMessage());
-        }
+    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
+        Movie saved = movieService.addNewMovie(movie);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<?> getMovies(@RequestParam(value = "featured", required = false) Boolean featured) {
-        try {
-            List<Movie> movies;
-            if (featured != null && featured) {
-                movies = movieService.findFeaturedMovies();
-            } else {
-                movies = movieService.getAllMovies();
-            }
-            return ResponseEntity.ok(movies);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .internalServerError()
-                    .body("Failed to retrieve movies: " + e.getMessage());
+    public ResponseEntity<List<Movie>> getMovies(@RequestParam(value = "featured", required = false) Boolean featured) {
+        List<Movie> movies;
+        if (Boolean.TRUE.equals(featured)) {
+            movies = movieService.findFeaturedMovies();
+        } else {
+            movies = movieService.getAllMovies();
         }
+        return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMovieById(@PathVariable String id) {
-        try {
-            Movie movie = movieService.getMovieById(id);
-            if (movie == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie with ID " + id + " not found.");
-            }
-            return ResponseEntity.ok(movie);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
-
-        } catch (Exception e) {
-            return ResponseEntity
-                    .internalServerError()
-                    .body("Error retrieving movie: " + e.getMessage());
-        }
+    public ResponseEntity<Movie> getMovieById(@PathVariable String id) {
+        Movie movie = movieService.getMovieById(id);
+        return ResponseEntity.ok(movie);
     }
 
     @PutMapping("/{id}")
     @SecureRoute
-    public ResponseEntity<?> updateMovieById(@PathVariable String id, @RequestBody Movie updatedMovie) {
-        try {
-            Movie movie = movieService.updateMovieById(id, updatedMovie);
-            return ResponseEntity.ok(movie);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-
-        } catch (NoSuchElementException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
-
-        } catch (Exception e) {
-            return ResponseEntity
-                    .internalServerError()
-                    .body("Failed to update movie: " + e.getMessage());
-        }
+    public ResponseEntity<Movie> updateMovieById(@PathVariable String id, @RequestBody Movie updatedMovie) {
+        Movie movie = movieService.updateMovieById(id, updatedMovie);
+        return ResponseEntity.ok(movie);
     }
 
     @DeleteMapping("/{id}")
     @SecureRoute
-    public ResponseEntity<?> deleteMovieById(@PathVariable String id) {
-        try {
-            movieService.deleteMovieById(id);
-            return ResponseEntity.ok("Movie with ID " + id + " deleted successfully.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-
-        } catch (NoSuchElementException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
-
-        } catch (Exception e) {
-            return ResponseEntity
-                    .internalServerError()
-                    .body("Failed to delete movie: " + e.getMessage());
-        }
+    public ResponseEntity<Map<String, String>> deleteMovieById(@PathVariable String id) {
+        movieService.deleteMovieById(id);
+        return ResponseEntity.ok(Map.of("message", "Movie with ID " + id + " deleted successfully."));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchMoviesByTitle(@RequestParam("title") String title) {
-        try {
-            List<Movie> movies = movieService.findByTitleContains(title);
-            return ResponseEntity.ok(movies);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .internalServerError()
-                    .body("Failed to search movies: " + e.getMessage());
-        }
+    public ResponseEntity<List<Movie>> searchMoviesByTitle(@RequestParam("title") String title) {
+        List<Movie> movies = movieService.findByTitleContains(title);
+        return ResponseEntity.ok(movies);
     }
 }
 

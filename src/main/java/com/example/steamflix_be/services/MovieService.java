@@ -1,8 +1,10 @@
 package com.example.steamflix_be.services;
 
+import com.example.steamflix_be.exceptions.AppException;
 import com.example.steamflix_be.models.Movie;
 import com.example.steamflix_be.repositories.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,41 +17,73 @@ public class MovieService {
     private MovieRepository movieRepo;
 
     public Movie addNewMovie(Movie movie) {
-        movie.setCreatedAt(new Date());
-        movie.setUpdatedAt(new Date());
-        return movieRepo.save(movie);
+        try {
+            movie.setCreatedAt(new Date());
+            movie.setUpdatedAt(new Date());
+            return movieRepo.save(movie);
+        } catch (Exception e) {
+            throw new AppException(
+                    "MOVIE_CREATION_FAILED",
+                    "Failed to create movie: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public List<Movie> getAllMovies() {
-        return movieRepo.findAll();
-    }
-
-    public List<Movie> findByTitleContains(String title) {
-        return movieRepo.findByTitleContainingIgnoreCase(title);
+        try {
+            return movieRepo.findAll();
+        } catch (Exception e) {
+            throw new AppException(
+                    "MOVIE_FETCH_FAILED",
+                    "Failed to retrieve all movies: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public List<Movie> findFeaturedMovies() {
-        return movieRepo.findByFeaturedTrue();
+        try {
+            return movieRepo.findByFeaturedTrue();
+        } catch (Exception e) {
+            throw new AppException(
+                    "MOVIE_FETCH_FAILED",
+                    "Failed to retrieve featured movies: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public Movie getMovieById(String id) {
         try {
-            return movieRepo.findById(id).orElse(null);
+            return movieRepo.findById(id)
+                    .orElseThrow(() -> new AppException(
+                            "NOT_FOUND",
+                            "Movie with ID " + id + " not found.",
+                            HttpStatus.NOT_FOUND
+                    ));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid movie ID format: " + e.getMessage());
+            throw new AppException(
+                    "INVALID_ID_FORMAT",
+                    "Invalid movie ID format: " + e.getMessage(),
+                    HttpStatus.BAD_REQUEST
+            );
         }
     }
 
     public Movie updateMovieById(String id, Movie updatedMovie) {
         if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("Movie ID must not be empty");
+            throw new AppException("INVALID_ID", "Movie ID must not be empty", HttpStatus.BAD_REQUEST);
         }
         if (updatedMovie == null) {
-            throw new IllegalArgumentException("Updated movie data is required");
+            throw new AppException("INVALID_DATA", "Updated movie data is required", HttpStatus.BAD_REQUEST);
         }
 
         Movie existingMovie = movieRepo.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Movie with ID " + id + " not found"));
+                .orElseThrow(() -> new AppException(
+                        "NOT_FOUND",
+                        "Movie with ID " + id + " not found",
+                        HttpStatus.NOT_FOUND));
 
         if (updatedMovie.getTitle() != null && !updatedMovie.getTitle().isBlank())
             existingMovie.setTitle(updatedMovie.getTitle().trim());
@@ -91,14 +125,26 @@ public class MovieService {
 
     public void deleteMovieById(String id) {
         if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("Movie ID must not be empty");
+            throw new AppException("INVALID_ID", "Movie ID must not be empty", HttpStatus.BAD_REQUEST);
         }
 
         boolean exists = movieRepo.existsById(id);
         if (!exists) {
-            throw new NoSuchElementException("Movie with ID " + id + " not found");
+            throw new AppException("NOT_FOUND", "Movie with ID " + id + " not found", HttpStatus.NOT_FOUND);
         }
 
         movieRepo.deleteById(id);
+    }
+
+    public List<Movie> findByTitleContains(String title) {
+        try {
+            return movieRepo.findByTitleContainingIgnoreCase(title);
+        } catch (Exception e) {
+            throw new AppException(
+                    "MOVIE_SEARCH_FAILED",
+                    "Failed to search movies by title: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

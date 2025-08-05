@@ -2,6 +2,9 @@ package com.example.steamflix_be.services;
 
 import com.example.steamflix_be.dto.LoginRequest;
 import com.example.steamflix_be.dto.LoginResponse;
+import com.example.steamflix_be.dto.RegisterResponse;
+import com.example.steamflix_be.exceptions.AppException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.example.steamflix_be.models.User;
 import com.example.steamflix_be.repositories.UserRepository;
@@ -18,23 +21,40 @@ public class AuthService {
         return userRepo.findByEmail(email).isPresent();
     }
 
-    public User register(User user) {
+    public RegisterResponse register(User user) {
         if (emailExists(user.getEmail())) {
-            throw new IllegalArgumentException("User with this email already exists.");
+            throw new AppException(
+                    "DUPLICATE",
+                    "User with this email already exists.",
+                    HttpStatus.CONFLICT
+            );
         }
 
-        // Encode the password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User savedUser = userRepo.save(user);
 
-        return userRepo.save(user);
+        return new RegisterResponse(
+                savedUser.getId(),
+                savedUser.getEmail(),
+                savedUser.getFirstName(),
+                savedUser.getLastName()
+        );
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
         User user = userRepo.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+                .orElseThrow(() -> new AppException(
+                        "INVALID_CREDENTIALS",
+                        "Invalid email or password.",
+                        HttpStatus.UNAUTHORIZED
+                ));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid email or password.");
+            throw new AppException(
+                    "INVALID_CREDENTIALS",
+                    "Invalid email or password.",
+                    HttpStatus.UNAUTHORIZED
+            );
         }
 
         String accessToken = jwtService.generateAccessToken(user);

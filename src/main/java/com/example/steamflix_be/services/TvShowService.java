@@ -1,8 +1,10 @@
 package com.example.steamflix_be.services;
 
+import com.example.steamflix_be.exceptions.AppException;
 import com.example.steamflix_be.models.TvShow;
 import com.example.steamflix_be.repositories.TvShowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,40 +15,72 @@ import java.util.NoSuchElementException;
 public class TvShowService {
     @Autowired private TvShowRepository tvShowRepo;
 
-    public List<TvShow> getAllTvShows() {
-        return tvShowRepo.findAll();
-    }
-
     public TvShow addNewTvShow(TvShow tvShow) {
-        return tvShowRepo.save(tvShow);
+        try {
+            return tvShowRepo.save(tvShow);
+        } catch (Exception e) {
+            throw new AppException(
+                    "TVSHOW_CREATION_FAILED",
+                    "Failed to create TV show: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
-    public List<TvShow> findByTitleContains(String title) {
-        return tvShowRepo.findByTitleContainingIgnoreCase(title);
+    public List<TvShow> getAllTvShows() {
+        try {
+            return tvShowRepo.findAll();
+        } catch (Exception e) {
+            throw new AppException(
+                    "TVSHOWS_FETCH_FAILED",
+                    "Failed to retrieve TV shows: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public List<TvShow> findFeaturedTvShows() {
-        return tvShowRepo.findByFeaturedTrue();
+        try {
+            return tvShowRepo.findByFeaturedTrue();
+        } catch (Exception e) {
+            throw new AppException(
+                    "TVSHOWS_FETCH_FAILED",
+                    "Failed to retrieve featured TV shows: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public TvShow getTvShowById(String id) {
         try {
-            return tvShowRepo.findById(id).orElse(null);
+            return tvShowRepo.findById(id)
+                    .orElseThrow(() -> new AppException(
+                            "NOT_FOUND",
+                            "TV Show with ID " + id + " not found.",
+                            HttpStatus.NOT_FOUND
+                    ));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid TV Show ID format: "+e.getMessage());
+            throw new AppException(
+                    "INVALID_ID_FORMAT",
+                    "Invalid TV Show ID format: " + e.getMessage(),
+                    HttpStatus.BAD_REQUEST
+            );
         }
     }
 
     public TvShow updateTvShowById(String id, TvShow updatedTvShow) {
         if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("TV Show ID must not be empty");
+            throw new AppException("INVALID_ID", "TV Show ID must not be empty", HttpStatus.BAD_REQUEST);
         }
         if (updatedTvShow == null) {
-            throw new IllegalArgumentException("Updated TV show data is required");
+            throw new AppException("INVALID_DATA", "Updated TV show data is required", HttpStatus.BAD_REQUEST);
         }
 
         TvShow existingTvShow = tvShowRepo.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("TV Show with ID " + id + " not found"));
+                .orElseThrow(() -> new AppException(
+                        "NOT_FOUND",
+                        "TV Show with ID " + id + " not found",
+                        HttpStatus.NOT_FOUND));
 
         if (updatedTvShow.getTitle() != null && !updatedTvShow.getTitle().isBlank())
             existingTvShow.setTitle(updatedTvShow.getTitle().trim());
@@ -94,14 +128,26 @@ public class TvShowService {
 
     public void deleteTvShowById(String id) {
         if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("TV Show ID must not be empty");
+            throw new AppException("INVALID_ID", "TV Show ID must not be empty", HttpStatus.BAD_REQUEST);
         }
 
         boolean exists = tvShowRepo.existsById(id);
         if (!exists) {
-            throw new NoSuchElementException("TV Show with ID " + id + " not found");
+            throw new AppException("NOT_FOUND", "TV Show with ID " + id + " not found", HttpStatus.NOT_FOUND);
         }
 
         tvShowRepo.deleteById(id);
+    }
+
+    public List<TvShow> findByTitleContains(String title) {
+        try {
+            return tvShowRepo.findByTitleContainingIgnoreCase(title);
+        } catch (Exception e) {
+            throw new AppException(
+                    "TVSHOWS_SEARCH_FAILED",
+                    "Failed to search TV shows by title: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }
