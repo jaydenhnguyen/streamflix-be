@@ -2,6 +2,7 @@ package com.example.steamflix_be.services;
 
 import com.example.steamflix_be.dto.LoginRequest;
 import com.example.steamflix_be.dto.LoginResponse;
+import com.example.steamflix_be.dto.RegisterRequest;
 import com.example.steamflix_be.dto.RegisterResponse;
 import com.example.steamflix_be.exceptions.AppException;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,8 @@ public class AuthService {
         return userRepo.findByEmail(email).isPresent();
     }
 
-    public RegisterResponse register(User user) {
-        if (emailExists(user.getEmail())) {
+    public RegisterResponse register(RegisterRequest registerRequest) {
+        if (emailExists(registerRequest.getEmail())) {
             throw new AppException(
                     "DUPLICATE",
                     "User with this email already exists.",
@@ -30,7 +31,12 @@ public class AuthService {
             );
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setFirstName(registerRequest.getFirstName());
+        user.setLastName(registerRequest.getLastName());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+
         User savedUser = userRepo.save(user);
 
         return new RegisterResponse(

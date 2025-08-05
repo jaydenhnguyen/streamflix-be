@@ -2,8 +2,8 @@ package com.example.steamflix_be.controllers;
 
 import com.example.steamflix_be.dto.LoginRequest;
 import com.example.steamflix_be.dto.LoginResponse;
+import com.example.steamflix_be.dto.RegisterRequest;
 import com.example.steamflix_be.dto.RegisterResponse;
-import com.example.steamflix_be.models.User;
 import com.example.steamflix_be.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +16,8 @@ public class AuthController {
     @Autowired private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> registerUser(@Valid @RequestBody User user) {
-        RegisterResponse savedUser = authService.register(user);
+    public ResponseEntity<RegisterResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        RegisterResponse savedUser = authService.register(registerRequest);
         return ResponseEntity.ok(savedUser);
     }
 
